@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+/* global DOMPurify */
+
 lucide.createIcons();
 
 // Sanitize HTML input before interpreting it as a full HTML document.
