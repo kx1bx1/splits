@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Splits - HTML Manager</title>
+    <!-- Dynamic SVG Favicon (Layout Template Icon) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230078D7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'&gt;&lt;rect width='18' height='18' x='3' y='3' rx='2'/&gt;&lt;path d='M21 9H3'/&gt;&lt;path d='M9 21V9'/&gt;&lt;/svg&gt;"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="flex flex-col h-screen">
+    <!-- Title Bar -->
+    <header
+      class="bg-[#1f1f1f] h-12 flex items-center justify-between px-4 select-none border-b border-[#2d2d2d] z-20"
+    >
+      <div class="flex items-center space-x-3">
+        <i data-lucide="layout-template" class="text-[#0078D7] w-5 h-5"></i>
+        <span class="text-sm font-semibold tracking-wide">Splits</span>
+      </div>
+      <div class="h-full flex">
+        <div id="tab-split" onclick="switchTab('split')" class="tab-btn active">SPLIT HTML</div>
+        <div id="tab-combine" onclick="switchTab('combine')" class="tab-btn">
+          COMBINE HTML/CSS/JS
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow relative overflow-hidden bg-[#0c0c0c]">
+      <!-- Splitter View -->
+      <div id="view-split" class="absolute inset-0 grid grid-cols-2 gap-[1px] p-[1px] animate-fade">
+        <!-- Left: Source -->
+        <div class="panel flex flex-col h-full animate-left">
+          <div class="panel-header">
+            <span
+              ><i data-lucide="file-code" class="inline w-3 h-3 mr-2 text-blue-400"></i>Source
+              HTML</span
+            >
+            <button
+              onclick="clearSplitInput()"
+              class="hover:text-red-400 transition-colors"
+              title="Clear all fields"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div class="flex-grow relative bg-[#1e1e1e]">
+            <textarea
+              id="split-input"
+              class="w-full h-full bg-transparent text-gray-300 p-4 outline-none"
+              placeholder="&lt;!-- Paste your full HTML document here --&gt;"
+            ></textarea>
+
+            <!-- Action Button Overlay -->
+            <div class="absolute bottom-6 right-6">
+              <button
+                onclick="processSplit()"
+                class="win-btn win-btn-primary px-5 py-2.5 shadow-xl"
+              >
+                <i data-lucide="scissors" class="w-4 h-4 mr-2"></i>
+                <span class="text-xs font-bold uppercase tracking-wider">Split File</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Outputs -->
+        <div class="flex flex-col gap-[1px] h-full animate-right">
+          <!-- HTML Out -->
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-orange-500">
+              <span>Body HTML (Auto-linked)</span>
+              <button
+                onclick="copyToClipboard('split-html-out')"
+                class="hover:text-white text-gray-500"
+              >
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <textarea
+              id="split-html-out"
+              readonly=""
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-400 p-3 outline-none"
+              placeholder="Extracted HTML..."
+            ></textarea>
+          </div>
+          <!-- CSS Out -->
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-blue-500">
+              <span>CSS (save as style.css)</span>
+              <button
+                onclick="copyToClipboard('split-css-out')"
+                class="hover:text-white text-gray-500"
+              >
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <textarea
+              id="split-css-out"
+              readonly=""
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-400 p-3 outline-none"
+              placeholder="Extracted CSS..."
+            ></textarea>
+          </div>
+          <!-- JS Out -->
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-yellow-500">
+              <span>JavaScript (save as script.js)</span>
+              <button
+                onclick="copyToClipboard('split-js-out')"
+                class="hover:text-white text-gray-500"
+              >
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <textarea
+              id="split-js-out"
+              readonly=""
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-400 p-3 outline-none"
+              placeholder="Extracted JS..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combiner View -->
+      <div id="view-combine" class="absolute inset-0 grid grid-cols-2 gap-[1px] p-[1px] hidden">
+        <!-- Left: Inputs -->
+        <div class="flex flex-col gap-[1px] h-full animate-left">
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-orange-500">
+              <span>Body HTML</span>
+              <button
+                onclick="pasteTo('combine-html-in')"
+                class="text-[9px] bg-[#333] px-1.5 py-0.5 hover:bg-[#444] border border-[#555]"
+              >
+                PASTE
+              </button>
+            </div>
+            <textarea
+              id="combine-html-in"
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-300 p-3 outline-none"
+              placeholder="Paste HTML body..."
+            ></textarea>
+          </div>
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-blue-500">
+              <span>CSS</span>
+              <button
+                onclick="pasteTo('combine-css-in')"
+                class="text-[9px] bg-[#333] px-1.5 py-0.5 hover:bg-[#444] border border-[#555]"
+              >
+                PASTE
+              </button>
+            </div>
+            <textarea
+              id="combine-css-in"
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-300 p-3 outline-none"
+              placeholder="Paste CSS..."
+            ></textarea>
+          </div>
+          <div class="panel flex flex-col h-1/3">
+            <div class="panel-header border-l-2 border-l-yellow-500">
+              <span>JavaScript</span>
+              <button
+                onclick="pasteTo('combine-js-in')"
+                class="text-[9px] bg-[#333] px-1.5 py-0.5 hover:bg-[#444] border border-[#555]"
+              >
+                PASTE
+              </button>
+            </div>
+            <textarea
+              id="combine-js-in"
+              class="w-full flex-grow bg-[#1e1e1e] text-gray-300 p-3 outline-none"
+              placeholder="Paste JS..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Right: Result -->
+        <div class="panel flex flex-col h-full animate-right">
+          <div class="panel-header">
+            <span
+              ><i data-lucide="file-check" class="inline w-3 h-3 mr-2 text-green-500"></i>Combined
+              Result</span
+            >
+            <div class="flex gap-2">
+              <button
+                onclick="copyToClipboard('combine-out')"
+                class="hover:text-white text-gray-500"
+                title="Copy Result"
+              >
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                onclick="downloadCombined()"
+                class="hover:text-white text-gray-500"
+                title="Download File"
+              >
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+          <div class="flex-grow relative bg-[#1e1e1e]">
+            <textarea
+              id="combine-out"
+              readonly=""
+              class="w-full h-full bg-transparent text-green-50 p-4 outline-none"
+              placeholder="Ready to combine..."
+            ></textarea>
+
+            <!-- Action Button Overlay -->
+            <div class="absolute bottom-6 left-6">
+              <button
+                onclick="processCombine()"
+                class="win-btn win-btn-primary px-5 py-2.5 shadow-xl"
+              >
+                <i data-lucide="merge" class="w-4 h-4 mr-2"></i>
+                <span class="text-xs font-bold uppercase tracking-wider">Combine Files</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Status Bar -->
+    <footer class="status-bar">
+      <div class="flex items-center gap-4">
+        <span id="status-text">Ready</span>
+        <div class="w-[1px] h-3 bg-white/20"></div>
+        <span>UTF-8</span>
+        <div class="w-[1px] h-3 bg-white/20"></div>
+        <span>HTML5</span>
+      </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed top-16 right-0 bg-[#2d2d2d] text-white px-5 py-3 shadow-2xl border-l-4 border-[#0078D7] transform translate-x-full transition-transform duration-300 z-50 flex items-center gap-3"
+    >
+      <i data-lucide="info" class="text-[#0078D7] w-5 h-5"></i>
+      <div class="flex flex-col">
+        <span id="toast-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+          >System</span
+        >
+        <span id="toast-msg" class="text-xs font-medium">Operation successful</span>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
