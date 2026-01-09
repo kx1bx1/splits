@@ -1,6 +1,18 @@
 /* eslint-disable no-unused-vars */
 lucide.createIcons();
 
+// Sanitize HTML input before interpreting it as a full HTML document.
+// DOMPurify should be loaded in the page (for example via a <script> tag)
+// and is expected to be available as the global DOMPurify object.
+function sanitizeHtmlInput(input) {
+  if (typeof DOMPurify !== "undefined" && input) {
+    // Use DOMPurify to sanitize the whole document while preserving content.
+    return DOMPurify.sanitize(input, { WHOLE_DOCUMENT: true });
+  }
+  // Fallback: return input unchanged if DOMPurify is not available.
+  return input;
+}
+
 function setStatus(text) {
   document.getElementById("status-text").textContent = text;
 }
@@ -109,7 +121,8 @@ function processCombine() {
 
   try {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+    const sanitizedHtml = sanitizeHtmlInput(html);
+    const doc = parser.parseFromString(sanitizedHtml, "text/html");
 
     // CLEANUP: Remove auto-linked style.css and script.js before combining
     doc
