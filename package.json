@@ -1,0 +1,30 @@
+{
+  "name": "splits-html-manager",
+  "version": "1.0.0",
+  "description": "A lightweight Windows 10 inspired tool to split and combine HTML, CSS, and JS files.",
+  "main": "html_splitter_combiner.html",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write .",
+    "test": "echo 'Error: no test specified' && exit 1",
+    "prerelease": "npm run lint:fix && npm run format",
+    "start": "serve ./src/"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "tool",
+    "splitter",
+    "combiner"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0",
+    "@eslint/js": "^9.0.0"
+  }
+}
