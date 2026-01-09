@@ -54,7 +54,8 @@ function processSplit() {
 
   try {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(input, "text/html");
+    const safeInput = sanitizeHtmlInput(input);
+    const doc = parser.parseFromString(safeInput, "text/html");
 
     let cssContent = "";
     doc.querySelectorAll("style").forEach((tag) => {
